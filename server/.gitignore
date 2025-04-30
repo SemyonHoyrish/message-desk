@@ -1,0 +1,14 @@
+
+.idea
+
+server
+*data.json
+
+.DS_Store
+Thumbs.db
+
+.env
+.env.*
+!.env.example
+!.env.test
+
