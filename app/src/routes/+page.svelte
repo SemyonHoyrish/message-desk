@@ -1,21 +1,45 @@
 <script>
-    import { PUBLIC_SERVICE_NAME } from '$env/static/public';
+    import { PUBLIC_SERVICE_NAME, PUBLIC_SERVER_API_URL } from '$env/static/public';
 
     import MessageCard from '$lib/components/MessageCard.svelte';
     import MessageInput from '$lib/components/MessageInput.svelte';
 
     import { onMount } from 'svelte';
     let data = $state([]);
-    onMount(() => {
-        const json = localStorage.getItem('data') || '[]';
-        data = JSON.parse(json);
+    onMount(async () => {
+        try {
+            const response = await fetch(PUBLIC_SERVER_API_URL + "/messages");
+
+            if (response.status === 200) {
+                const d = await response.json();
+                data = d;
+            }
+        } catch (err) {
+            console.log("ERROR" + err.error);
+        }
     });
 
-    const sendMessage = (value) => {
+    const sendMessage = async (value) => {
         if (value.replaceAll(' ', '') === '') return;
 
-        data.push(value);
-        localStorage.setItem('data', JSON.stringify(data));
+        try {
+            const response = await fetch(PUBLIC_SERVER_API_URL + "/send", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({content: value})
+            });
+
+            if (response.status == 200) {
+                data.push({content: value});
+            } else {
+                console.log("error");
+                console.log(await response.json());
+            } 
+        } catch (err) {
+            console.log("ERROR" + err.error);
+        }
     };
 </script>
 
@@ -27,7 +51,7 @@
 <MessageInput sendMessage={sendMessage} />
 
 {#each data.toReversed() as msg}
-    <MessageCard text={msg} />
+    <MessageCard text={msg.content} />
 {/each}
 <MessageCard text="hello, world!" />
 <MessageCard text="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum" />
