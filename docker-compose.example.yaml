@@ -15,8 +15,4 @@ services:
     build: ./app
     ports:
       - "8000:80"
-    environment:
-      - PUBLIC_SERVICE_NAME=someservice
-      - PUBLIC_SERVER_API_URL=http://localhost:3000/api/v0
-    
 
