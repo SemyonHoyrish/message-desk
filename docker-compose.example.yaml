@@ -1,0 +1,22 @@
+
+services:
+  server:
+    build: ./server
+    ports:
+      - "3000:3000"
+    environment:
+      - DATA_FILENAME=data/data.json
+    volumes:
+      - type: bind
+        source: ./data
+        target: /server/data
+
+  app:
+    build: ./app
+    ports:
+      - "8000:80"
+    environment:
+      - PUBLIC_SERVICE_NAME=someservice
+      - PUBLIC_SERVER_API_URL=http://localhost:3000/api/v0
+    
+
